@@ -1,21 +1,29 @@
-FROM banderson/node-bower-gulp
+FROM node:10
 
 RUN npm install -g ember-cli
 
 # Watchman
-RUN git clone https://github.com/facebook/watchman.git /root/watchman \
+RUN apt-get update \
+    && apt-get install -y \
+        autoconf \
+        automake \
+        build-essential \
+        python-dev \
+        git \
+    && git clone https://github.com/facebook/watchman.git /root/watchman \
     && cd /root/watchman \
     && git checkout v4.9.0 \
-    && apt-get update \
-    && apt-get install -y autoconf automake build-essential python-dev \
     && ./autogen.sh \
     && ./configure \
     && make \
     && make install \
     && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && mkdir /data
 
 EXPOSE 7020
 EXPOSE 4200
+
+WORKDIR /data
 
 CMD ["ember", "serve"]
